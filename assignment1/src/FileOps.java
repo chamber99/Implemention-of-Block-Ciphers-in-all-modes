@@ -20,13 +20,13 @@ public class FileOps {
             }
 
 
-            try {
-                FileWriter writer = new FileWriter(file_name);
-                writer.write(content);
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                FileWriter writer = new FileWriter(file_name);
+//                writer.write(content);
+//                writer.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
         }
         public String[] readFile(String path) {
         try {
