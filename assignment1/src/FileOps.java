@@ -1,52 +1,34 @@
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class FileOps {
-    public void appendLine(String content) {
-        String filename = "run.log";
-        try {
-            FileReader fileReader = new FileReader(filename);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            List<String> list = bufferedReader.lines().collect(Collectors.toList());
-            list.add(content);
+        public void appendLine(String filename, String content){
+            // do stuff
+        }
 
-            FileWriter fileWriter = new FileWriter(filename);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        public void writeFile(String name,String content){
+            String file_name = name+".txt";
+            File file = new File(file_name);
 
-            for (String s : list) {
-                bufferedWriter.write(s);
+            if(file.isFile() && file.exists()){
+
+            }else{
+
             }
 
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-
+//            try {
+//                FileWriter writer = new FileWriter(file_name);
+//                writer.write(content);
+//                writer.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
         }
-
-        
-
-    }
-
-    public void writeFile(String name, String content) throws IOException {
-        File file = new File(name);
-
-        if (file.isFile() && file.exists()) {
-            appendLine(content);
-        } else {
-            try {
-                FileWriter writer = new FileWriter(name);
-                writer.write(content);
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    public String[] readFile(String path) {
+        public String[] readFile(String path) {
         try {
             int i = 0;
             int length = Files.readAllLines(Paths.get(path)).size();
@@ -62,7 +44,7 @@ public class FileOps {
 
     }
 
-}
+    }
 
 
 
