@@ -28,20 +28,20 @@ public class Main {
         // CBC
         FileCipher fileCipher = new FileCipher();
 
-        byte[] message = "denemexd".getBytes(StandardCharsets.UTF_8);
+        byte[] message = "deneme88".getBytes(StandardCharsets.UTF_8);
 
         byte[] IV = "iviviviv".getBytes(StandardCharsets.UTF_8);
 
         //byte[] key = "5YBuFATucUweceMY".getBytes(StandardCharsets.UTF_8);
-        byte[] key = "denemeas".getBytes(StandardCharsets.UTF_8);
+        byte[] key = "keykeyke".getBytes(StandardCharsets.UTF_8);
 
         byte[] nonce = "noncenon".getBytes(StandardCharsets.UTF_8);
 
-        String enc = fileCipher.OFBEncryption(IV,message,key);
+        String enc = fileCipher.CFBEncryption(IV,message,key);
 
         System.out.println(enc);
 
-        System.out.println(fileCipher.OFBDecryption(IV,enc.getBytes(StandardCharsets.UTF_8),key));
+        fileCipher.CFBDecryption(IV,enc.getBytes(StandardCharsets.UTF_8),key);
 
 
 

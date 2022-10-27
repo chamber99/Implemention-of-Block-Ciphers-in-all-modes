@@ -1,6 +1,8 @@
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -43,8 +45,23 @@ public class FileCipher {
 
         }
 
-
         return preparedInput;
+    }
+
+    public String prepareOutput(byte[] decryptedBytes){
+        String decrypted  = "";
+        char[] decString = new char[decryptedBytes.length];
+
+        for(int i = 0; i < decryptedBytes.length; i += 2){
+            char c = (char) (decryptedBytes[i] & 0xFF);
+            decString[i] = c;
+        }
+
+        Charset charset = StandardCharsets.UTF_8;
+
+        decrypted = new String(decryptedBytes);
+        System.out.println(decrypted);
+        return decrypted;
     }
 
 
@@ -108,6 +125,42 @@ public class FileCipher {
         return encryptedMessage;
     }
 
+    public String CFBDecryption(byte[] IV, byte[] cipherText, byte[] encodedKey)throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+        String decryptedMessage = "";
+        byte[] lastInput = IV;
+
+        byte[] bytes = new byte[cipherText.length];
+
+        int blockCount = cipherText.length / 8;
+        int currentBlock = 1;
+
+        while (currentBlock <= blockCount) {
+            byte[] currentCipherText = new byte[8];
+            int index = 0;
+            for (int i = (currentBlock - 1) * 8; i < currentBlock * 8; i++) {
+                currentCipherText[index] = cipherText[i];
+                index++;
+            }
+
+            byte[] cipherInput = lastInput;
+            Key key = new SecretKeySpec(encodedKey, 0, encodedKey.length, "DES");
+            desCipher.init(Cipher.ENCRYPT_MODE, key);
+            byte[] output =  desCipher.doFinal(cipherInput);
+            byte[] decrypted = XOR(output,currentCipherText);
+            lastInput = decrypted;
+            decryptedMessage += new String(decrypted);
+
+            for(int z = 0; z < decrypted.length; z++){
+                 bytes[(currentBlock-1) * 8 + z] = decrypted[z];
+            }
+
+            currentBlock++;
+        }
+        prepareOutput(bytes);
+
+        return decryptedMessage;
+    }
+
 
 
     public String OFBEncryption(byte[] IV, byte[] plainText, byte[] encodedKey) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
@@ -143,6 +196,8 @@ public class FileCipher {
         String decryptedMessage = "";
         byte[] lastInput = IV;
 
+        byte[] bytes = new byte[cipherText.length];
+
         int blockCount = cipherText.length / 8;
         int currentBlock = 1;
 
@@ -162,9 +217,15 @@ public class FileCipher {
             byte[] output = desCipher.doFinal(cipherInput);
             byte[] decrypted = XOR(currentCipherText, output);
             lastInput = output;
+
+            for(int z = 0; z < decrypted.length; z++){
+                bytes[(currentBlock-1) * 8 + z] = decrypted[z];
+            }
+
             decryptedMessage += new String(decrypted);
             currentBlock++;
         }
+        prepareOutput(bytes);
         return decryptedMessage;
     }
 
