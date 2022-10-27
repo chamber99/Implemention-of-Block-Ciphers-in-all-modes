@@ -37,11 +37,12 @@ public class Main {
 
         byte[] nonce = "noncenon".getBytes(StandardCharsets.UTF_8);
 
-        String enc = fileCipher.CFBEncryption(IV,message,key);
-
+        String enc = fileCipher.OFBEncryption(IV,message,key);
+        System.out.println();
         System.out.println(enc);
+        System.out.println();
 
-        fileCipher.CFBDecryption(IV,enc.getBytes(StandardCharsets.UTF_8),key);
+        fileCipher.OFBDecryption(IV,enc.getBytes(StandardCharsets.UTF_8),key);
 
 
 

@@ -118,6 +118,11 @@ public class FileCipher {
             Key key = new SecretKeySpec(encodedKey, 0, encodedKey.length, "DES");
             desCipher.init(Cipher.ENCRYPT_MODE, key);
             byte[] encrypted = XOR(currentPlainText, desCipher.doFinal(cipherInput));
+
+            for(Byte b : encrypted){
+                System.out.println(Integer.toBinaryString(0x100 + (b & 0xFF)).substring(1));
+            }
+
             lastInput = encrypted;
             encryptedMessage += new String(encrypted);
             currentBlock++;
@@ -147,6 +152,12 @@ public class FileCipher {
             desCipher.init(Cipher.ENCRYPT_MODE, key);
             byte[] output =  desCipher.doFinal(cipherInput);
             byte[] decrypted = XOR(output,currentCipherText);
+
+            for(Byte b : decrypted){
+                System.out.println(Integer.toBinaryString(0x100 + (b & 0xFF)).substring(1));
+            }
+
+
             lastInput = decrypted;
             decryptedMessage += new String(decrypted);
 
@@ -157,6 +168,7 @@ public class FileCipher {
             currentBlock++;
         }
         prepareOutput(bytes);
+
 
         return decryptedMessage;
     }
@@ -188,6 +200,11 @@ public class FileCipher {
             lastInput = output;
             encryptedMessage += new String(encrypted);
             currentBlock++;
+
+            for(Byte b : encrypted){
+                System.out.println(Integer.toBinaryString(0x100 + (b & 0xFF)).substring(1));
+            }
+
         }
         return encryptedMessage;
     }
@@ -224,6 +241,10 @@ public class FileCipher {
 
             decryptedMessage += new String(decrypted);
             currentBlock++;
+
+            for(Byte b : decrypted){
+                System.out.println(Integer.toBinaryString(0x100 + (int) (b & 0xFF)).substring(1));
+            }
         }
         prepareOutput(bytes);
         return decryptedMessage;
