@@ -5,6 +5,16 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class FileOps {
+        public String output;
+
+        public FileOps(){
+            output = "";
+        }
+
+        public void write(String s){
+            output += " \n" + s;
+        }
+
         public void appendLine(String filename, String content){
             // do stuff
         }
