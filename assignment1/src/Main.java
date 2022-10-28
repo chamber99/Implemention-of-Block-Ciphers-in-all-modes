@@ -8,7 +8,6 @@ import java.security.NoSuchAlgorithmException;
 
 public class Main {
     public static void main(String[] args) throws NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, IOException, BadPaddingException, InvalidKeyException {
-        FileCipher fileCipher = new FileCipher();
         FileCipher.run(args);
     }
 }

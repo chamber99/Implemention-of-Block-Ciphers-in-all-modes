@@ -17,11 +17,14 @@ public class FileCipher {
     public static void main(String[] args)  {
         try {
             run(args);
-        } catch (IOException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
+        } catch (IOException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException |
+                 NoSuchPaddingException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
     }
-    public static void run(String[] commands) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+
+    public static void run(String[] commands) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException {
+        des = Cipher.getInstance("DES/ECB/NoPadding");
         String operation = commands[0];
         String inputFile = commands[2];
         String outputFile = commands[4];
@@ -42,7 +45,7 @@ public class FileCipher {
 
         SecretKey[] keys;
 
-        if(algorithm == "DES"){
+        if(algorithm.equals("DES")){
             keys = generateKey(fileOps.getKey(),1);
             algoInput = 1;
         }else{
@@ -54,7 +57,7 @@ public class FileCipher {
 
         //CBC, CFB, OFB, or CTR.
 
-        if(operation == "e"){
+        if(operation.equals("-e")){
             switch (mode){
                 case "CBC":
                     result = CBCEncryption(IV,padded,keys,algoInput);
@@ -72,19 +75,19 @@ public class FileCipher {
                     result = new byte[0];
                     break;
             }
-        } else if (operation == "d") {
+        } else if (operation.equals("-d")) {
             switch (mode){
                 case "CBC":
-                    result = CBCEncryption(IV,padded,keys,algoInput);
+                    result = CBCDecryption(IV,padded,keys,algoInput);
                     break;
                 case "CFB":
-                    result = CFBEncryption(IV,padded,keys,algoInput);
+                    result = CFBDecryption(IV,padded,keys,algoInput);
                     break;
                 case "OFB":
-                    result = OFBEncryption(IV,padded,keys,algoInput);
+                    result = OFBDecryption(IV,padded,keys,algoInput);
                     break;
                 case "CTR":
-                    result = CTREncryption(IV,padded,keys,algoInput);
+                    result = CTRDecryption(IV,padded,keys,algoInput);
                     break;
                 default:
                     result = new byte[0];
@@ -231,7 +234,7 @@ public class FileCipher {
             if (algorithm == 1) {
                 decrypted = XOR(useDES(cipherInput, key[0], 1), currentCipherText);
             } else if (algorithm == 2) {
-                XOR(use3DES(cipherInput, key, 1), currentCipherText);
+                decrypted = XOR(use3DES(cipherInput, key, 1), currentCipherText);
             }
 
             for (byte b : decrypted) {
