@@ -13,21 +13,25 @@ public class FileOps {
 
     private String inputFileName;
     private String outputFileName;
-    private String modeName;
-    private String cipherName;
-    private String operationName;
-
+    private String OperationName;
+    private String CipherName;
+    private String ModeName;
     private long startTime;
     private long endTime;
 
-    public FileOps(String inputFile, String outputFile, String keyFile) throws IOException {
+    public FileOps(String inputFile, String outputFile, String keyFile, String modeName, String cipherName, String operationName) throws IOException {
         inputFileName = inputFile;
         outputFileName = outputFile;
+        OperationName = operationName;
+        ModeName = modeName;
+        CipherName = cipherName;
 
 
-        //inputFileStream = new FileInputStream(inputFile);
+        inputFileStream = new FileInputStream(inputFile);
 
-        //os = new FileOutputStream(outputFile);
+        File OutputFile = new File(outputFileName);
+        outputFileStream = new FileOutputStream(outputFile);
+
         readKeyIvNonce(keyFile);
     }
 
@@ -49,19 +53,21 @@ public class FileOps {
 
     public void endTimer() {
         endTime = System.currentTimeMillis();
+
+        long runtime = calculateRuntime();
+        writeLog(inputFileName + " " + outputFileName + " " + OperationName + " " + CipherName + " " + ModeName + " " + runtime);
+
     }
 
-    public String calculateRuntime() {
-        String runTime = "";
+    public long calculateRuntime() {
         long difference = endTime - startTime;
-        runTime = String.valueOf(difference);
 
         endTime = 0L;
         startTime = 0L;
-        return runTime;
+        return difference;
     }
-    public byte[] readInputFile() throws IOException {
 
+    public byte[] readInputFile() throws IOException {
         byte[] inputArray = new byte[inputFileStream.available()];
         inputFileStream.read(inputArray);
         return inputArray;
@@ -104,6 +110,7 @@ public class FileOps {
             }
         }
     }
+
     public String[] readFile(String path) {
         try {
             int i = 0;
