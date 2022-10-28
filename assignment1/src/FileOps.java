@@ -61,7 +61,10 @@ public class FileOps {
         return runTime;
     }
     public byte[] readInputFile() throws IOException {
-        return inputFileStream.readAllBytes();
+
+        byte[] inputArray = new byte[inputFileStream.available()];
+        inputFileStream.read(inputArray);
+        return inputArray;
     }
 
     public void writeOutputFile(byte[] content) throws IOException {

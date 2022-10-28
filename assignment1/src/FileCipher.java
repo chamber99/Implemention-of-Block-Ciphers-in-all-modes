@@ -348,7 +348,7 @@ public class FileCipher {
         return finalArray;
     }
 
-    public SecretKey[] generateKey(String input, int operation) {
+    public SecretKey[] generateKey(String input, int operation){ // 1 for des,2 for 3des
         SecretKey[] keys = null;
         int hashCode = input.hashCode();
         byte[] keyBytes = createByteArray(hashCode);
@@ -363,10 +363,9 @@ public class FileCipher {
             keys[2] = new SecretKeySpec(XOR(createByteArray(hashCode + 500), createByteArray(hashCode - 500)), "DES");
         }
         return keys;
-
     }
 
-    public byte[] generateIV(String input) {
+    public byte[] generateIV(String input) { // nonce ve ıv generator
         int hashCode = input.hashCode();
         byte[] bytes = createByteArray(hashCode);
         return bytes;
