@@ -22,7 +22,6 @@ public class FileCipher {
             throw new RuntimeException(e);
         }
     }
-
     public static void run(String[] commands) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException {
         des = Cipher.getInstance("DES/ECB/NoPadding");
         String operation = commands[0];
@@ -39,7 +38,7 @@ public class FileCipher {
         fileOps.startTimer();
 
         byte[] input = fileOps.readInputFile();
-        byte[] padded = padPlainText(input);
+        byte[] padded;
         byte[] IV = generateIVorNonce(fileOps.getIV());
         byte[] nonce = generateIVorNonce(fileOps.getNonce());
 
@@ -58,6 +57,7 @@ public class FileCipher {
         //CBC, CFB, OFB, or CTR.
 
         if(operation.equals("-e")){
+            padded = padPlainText(input);
             switch (mode){
                 case "CBC":
                     result = CBCEncryption(IV,padded,keys,algoInput);
@@ -78,16 +78,16 @@ public class FileCipher {
         } else if (operation.equals("-d")) {
             switch (mode){
                 case "CBC":
-                    result = CBCDecryption(IV,padded,keys,algoInput);
+                    result = CBCDecryption(IV,input,keys,algoInput);
                     break;
                 case "CFB":
-                    result = CFBDecryption(IV,padded,keys,algoInput);
+                    result = CFBDecryption(IV,input,keys,algoInput);
                     break;
                 case "OFB":
-                    result = OFBDecryption(IV,padded,keys,algoInput);
+                    result = OFBDecryption(IV,input,keys,algoInput);
                     break;
                 case "CTR":
-                    result = CTRDecryption(IV,padded,keys,algoInput);
+                    result = CTRDecryption(IV,input,keys,algoInput);
                     break;
                 default:
                     result = new byte[0];
@@ -98,14 +98,13 @@ public class FileCipher {
         }
 
         fileOps.writeOutputFile(result);
-
         fileOps.endTimer();
-
-
-
     }
 
     public static byte[] padPlainText(byte[] plainText) {
+        for(byte b : plainText){
+            System.out.println(b);
+        }
         byte[] byteArray = plainText;
         int remainder = byteArray.length % 8;
         byte[] padded = new byte[byteArray.length + (8 - remainder)];
@@ -115,6 +114,15 @@ public class FileCipher {
             padded[index++] = b;
         }
         return padded;
+    }
+    public static byte[] clearPadding(byte[] padded){
+        byte lastByte = padded[padded.length - 1];
+        int plainTextLength = padded.length - lastByte;
+        byte[] withoutPadding = new byte[plainTextLength];
+        for (int i = 0; i < plainTextLength; i++) {
+            withoutPadding[i] = padded[i];
+        }
+        return withoutPadding;
     }
 
     public static byte[] CBCEncryption(byte IV[], byte plainText[], SecretKey[] key, int algorithm) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
@@ -152,7 +160,6 @@ public class FileCipher {
         int outputIndex = 0;
         byte[] previousCipherText = IV;
         int blockCount = cipherText.length / 8;
-        System.out.println(blockCount);
         int currentBlock = 1;
         while (currentBlock <= blockCount) {
             byte[] currentCipherText = new byte[8];
@@ -174,14 +181,8 @@ public class FileCipher {
             }
             currentBlock++;
         }
-        byte lastByte = decryptedMessage[decryptedMessage.length - 1];
-        int plainTextLength = decryptedMessage.length - lastByte;
-        byte[] withoutPadding = new byte[plainTextLength];
-        for (int i = 0; i < plainTextLength; i++) {
-            withoutPadding[i] = decryptedMessage[i];
-        }
 
-        return withoutPadding;
+        return clearPadding(decryptedMessage);
     }
 
     public static byte[] CFBEncryption(byte[] IV, byte[] plainText, SecretKey[] key, int algorithm) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
@@ -243,7 +244,7 @@ public class FileCipher {
             lastInput = currentCipherText;
             currentBlock++;
         }
-        return decryptedMessage;
+        return clearPadding(decryptedMessage);
     }
 
     public static byte[] OFBEncryption(byte[] IV, byte[] plainText, SecretKey[] key, int algorithm) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
@@ -309,7 +310,7 @@ public class FileCipher {
             }
             currentBlock++;
         }
-        return decryptedMessage;
+        return clearPadding(decryptedMessage);
     }
 
     public static byte[] CTREncryption(byte[] nonce, byte[] plainText, SecretKey[] key, int algorithm) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
@@ -377,7 +378,7 @@ public class FileCipher {
             }
             currentBlock++;
         }
-        return decryptedMessage;
+        return clearPadding(decryptedMessage);
     }
 
     public static byte[] useDES(byte[] input, SecretKey key, int operation) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
