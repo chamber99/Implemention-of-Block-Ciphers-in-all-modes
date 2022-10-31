@@ -5,33 +5,28 @@ import java.nio.file.StandardOpenOption;
 import java.util.Timer;
 
 public class FileOps {
+    // Instance variables
     private InputStream inputFileStream;
     private OutputStream outputFileStream;
     private String key;
     private String nonce;
     private String IV;
-
     private String inputFileName;
     private String outputFileName;
     private String OperationName;
     private String CipherName;
     private String ModeName;
-    private long startTime;
-    private long endTime;
 
+    // Constructor
     public FileOps(String inputFile, String outputFile, String keyFile, String modeName, String cipherName, String operationName) throws IOException {
         inputFileName = inputFile;
         outputFileName = outputFile;
         OperationName = operationName;
         ModeName = modeName;
         CipherName = cipherName;
-
-
         inputFileStream = new FileInputStream(inputFile);
-
         File OutputFile = new File(outputFileName);
         outputFileStream = new FileOutputStream(outputFile);
-
         readKeyIvNonce(keyFile);
     }
 
@@ -47,36 +42,24 @@ public class FileOps {
         return IV;
     }
 
-    public void startTimer() {
-        startTime = System.currentTimeMillis();
-    }
-
-    public void endTimer() {
-        endTime = System.currentTimeMillis();
-
-        long runtime = calculateRuntime();
+    // Stops the timer and creates/updates the log file.
+    public void end(long runtime) {
         writeLog(inputFileName + " " + outputFileName + " " + OperationName + " " + CipherName + " " + ModeName + " " + runtime);
 
     }
-
-    public long calculateRuntime() {
-        long difference = endTime - startTime;
-
-        endTime = 0L;
-        startTime = 0L;
-        return difference;
-    }
-
+    // Reads the bytes of input file.
     public byte[] readInputFile() throws IOException {
         byte[] inputArray = new byte[inputFileStream.available()];
         inputFileStream.read(inputArray);
         return inputArray;
     }
 
+    // Creates/Updates the output file by using the content.
     public void writeOutputFile(byte[] content) throws IOException {
         outputFileStream.write(content);
     }
 
+    // Reads the key file and splits the components.
     public void readKeyIvNonce(String keyFile) throws IOException {
         String[] allLines = readFile(keyFile);
         String result = "";
@@ -90,6 +73,7 @@ public class FileOps {
         nonce = splitter[2].trim();
     }
 
+    // Creates/Updates run.log file by using the content.
     public void writeLog(String content) {
         File file = new File("run.log");
         if (file.isFile() && file.exists()) {
@@ -110,7 +94,7 @@ public class FileOps {
             }
         }
     }
-
+    // Reads files as string.
     public String[] readFile(String path) {
         try {
             int i = 0;
